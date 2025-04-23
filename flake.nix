@@ -36,15 +36,29 @@
         export BACKEND_VM="${backend.config.system.build.vm}"
         exec ${./run-vm.sh}
       '';
+
+      pythonEnv = pkgs.python312.withPackages (ps:
+        with ps; [
+          pytest
+          gunicorn
+          fastapi
+        ]);
     in {
       packages = {
-        inherit backend frontend;
         default = program;
       };
 
       apps.default = {
         type = "app";
         program = "${program}";
+      };
+
+      devShell = pkgs.mkShell {
+        buildInputs = [pythonEnv];
+        shellHook = ''
+          export PYTHONPATH="${pythonEnv}:$PYTHONPATH:${pythonEnv}/${pythonEnv.sitePackages}"
+          exec zsh
+        '';
       };
     });
 }

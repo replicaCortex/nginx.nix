@@ -1,3 +1,5 @@
 nixos.qcow2
 frontend.log
 backend.log
+backend/__pycache__/
+
